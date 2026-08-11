@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="card shadow-sm p-4 bg-white border-0">
+    <h3 class="mb-3 text-dark fw-bold">Launch Email Campaign</h3>
+    <form id="sendForm">
+        <div class="mb-3">
+            <label class="form-label fw-bold">Target Audience</label>
+            <select id="audience" class="form-select">
+                <option value="business">Business Emails Only (business_emails.csv)</option>
+                <option value="individual">Individual Emails Only (individual_emails.csv)</option>
+                <option value="all">All Discovered Buyers (buyers.csv)</option>
+            </select>
+        </div>
+        <div class="mb-3">
+            <label class="form-label fw-bold">Email Subject</label>
+            <input type="text" id="subject" class="form-control" value="Exclusive Export Opportunities — Singing Bowls Catalog">
+        </div>
+        <div class="mb-3">
+            <label class="form-label fw-bold">Delay Between Emails (Seconds)</label>
+            <input type="number" id="sendDelay" class="form-control" value="2" min="1">
+        </div>
+        <button type="button" onclick="runCampaign()" class="btn btn-success fw-bold">Send Campaign (With PDF Attachment)</button>
+    </form>
+
+    <div id="statusAlert" class="mt-4"></div>
+</div>
+
+<script>
+async function runCampaign() {
+    const alertDiv = document.getElementById("statusAlert");
+    alertDiv.innerHTML = `<div class="alert alert-info">Authenticating Gmail SMTP and dispatching outreach campaign... Please wait.</div>`;
+
+    const audience = document.getElementById("audience").value;
+    const subject = document.getElementById("subject").value;
+    const send_delay = parseInt(document.getElementById("sendDelay").value);
+
+    try {
+        const res = await fetch("/send", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ audience, subject, send_delay })
+        });
+        const data = await res.json();
+        const summary = data.campaign_summary;
+        alertDiv.innerHTML = `
+            <div class="alert alert-success">
+                <h5>Campaign Completed!</h5>
+                <p>Emails Sent: <strong>${summary.sent}</strong></p>
+                <p>Skipped (Duplicates): <strong>${summary.skipped}</strong></p>
+                <p>Failed: <strong>${summary.failed}</strong></p>
+            </div>`;
+    } catch (err) {
+        alertDiv.innerHTML = `<div class="alert alert-danger">Error launching campaign.</div>`;
+    }
+}
+</script>
+{% endblock %}

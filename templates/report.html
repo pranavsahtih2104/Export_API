@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="card shadow-sm p-4 bg-white border-0">
+    <h3 class="mb-3 text-dark fw-bold">Outreach Campaign Analytics & Reports</h3>
+    <p class="text-muted">View live status counts and download your complete historical audit log (<code>sent_log.csv</code>).</p>
+
+    <div class="row text-center my-4">
+        <div class="col-md-4 mb-3">
+            <div class="card bg-light border p-3">
+                <h6 class="text-muted text-uppercase fw-bold">Total Sent</h6>
+                <h2 class="fw-bold text-success" id="statSent">0</h2>
+            </div>
+        </div>
+        <div class="col-md-4 mb-3">
+            <div class="card bg-light border p-3">
+                <h6 class="text-muted text-uppercase fw-bold">Total Failed</h6>
+                <h2 class="fw-bold text-danger" id="statFailed">0</h2>
+            </div>
+        </div>
+        <div class="col-md-4 mb-3">
+            <div class="card bg-light border p-3">
+                <h6 class="text-muted text-uppercase fw-bold">Success Rate</h6>
+                <h2 class="fw-bold text-primary" id="statRate">0%</h2>
+            </div>
+        </div>
+    </div>
+
+    <div class="d-flex gap-2">
+        <a href="/report?download=true" class="btn btn-primary fw-bold">
+            📥 Download CSV Report (sent_log.csv)
+        </a>
+        <button onclick="fetchStats()" class="btn btn-outline-secondary">
+            🔄 Refresh Stats
+        </button>
+    </div>
+</div>
+
+<script>
+async function fetchStats() {
+    try {
+        const res = await fetch("/report");
+        const data = await res.json();
+        const r = data.report;
+        document.getElementById("statSent").innerText = r.total_sent;
+        document.getElementById("statFailed").innerText = r.total_failed;
+        document.getElementById("statRate").innerText = r.success_rate;
+    } catch (err) {
+        console.error("Failed to load report stats:", err);
+    }
+}
+
+// Automatically fetch stats when page loads
+window.onload = fetchStats;
+</script>
+{% endblock %}

@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="card shadow-sm p-4 bg-white border-0">
+    <h3 class="mb-3 text-dark fw-bold">Buyer Discovery Search</h3>
+    <form id="searchForm">
+        <div class="mb-3">
+            <label class="form-label font-weight-bold">Search Keyword / Niche</label>
+            <input type="text" id="keyword" class="form-control" value="Singing Bowls" required>
+        </div>
+        <div class="mb-3">
+            <label class="form-label">Max Web Results to Scrape</label>
+            <input type="number" id="maxResults" class="form-control" value="5" min="1" max="20">
+        </div>
+        <button type="button" onclick="runSearch()" class="btn btn-primary">Start Web Discovery</button>
+    </form>
+
+    <div id="statusAlert" class="mt-4"></div>
+</div>
+
+<script>
+async function runSearch() {
+    const alertDiv = document.getElementById("statusAlert");
+    alertDiv.innerHTML = `<div class="alert alert-info">Searching web for buyers... Please wait.</div>`;
+    
+    const keyword = document.getElementById("keyword").value;
+    const max_results = parseInt(document.getElementById("maxResults").value);
+
+    try {
+        const res = await fetch("/search", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ keyword, max_results })
+        });
+        const data = await res.json();
+        alertDiv.innerHTML = `<div class="alert alert-success">Search complete! Found <strong>${data.new_leads_found}</strong> new buyer contacts. Saved to buyers.csv.</div>`;
+    } catch (err) {
+        alertDiv.innerHTML = `<div class="alert alert-danger">Error running search.</div>`;
+    }
+}
+</script>
+{% endblock %}

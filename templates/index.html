@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="p-5 mb-4 bg-white rounded-3 shadow-sm border">
+    <h1 class="display-5 fw-bold text-primary">EXPORT Automation System</h1>
+    <p class="col-md-8 fs-5 text-secondary">
+        Automated lead discovery, AI email classification, and Gmail outreach pipeline for Singing Bowls export sales.
+    </p>
+</div>
+
+<div class="row text-center">
+    <div class="col-md-6 mb-3">
+        <div class="card shadow-sm border-0 bg-primary text-white p-4">
+            <h3>Discovered Buyers</h3>
+            <h1 class="display-4 fw-bold">{{ total_buyers }}</h1>
+            <a href="/ui/search" class="btn btn-light btn-sm mt-2 text-primary fw-bold">Search New Buyers</a>
+        </div>
+    </div>
+    <div class="col-md-6 mb-3">
+        <div class="card shadow-sm border-0 bg-success text-white p-4">
+            <h3>Total Contacted</h3>
+            <h1 class="display-4 fw-bold">{{ total_sent }}</h1>
+            <a href="/ui/send" class="btn btn-light btn-sm mt-2 text-success fw-bold">Launch Outreach</a>
+        </div>
+    </div>
+</div>
+{% endblock %}

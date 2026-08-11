@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="card shadow-sm p-4 bg-white border-0">
+    <h3 class="mb-3 text-dark fw-bold">Upload Custom Leads CSV</h3>
+    <p class="text-muted">Import custom lead lists directly into <code>buyers.csv</code>.</p>
+    
+    <form id="uploadForm">
+        <div class="mb-3">
+            <label class="form-label fw-bold">Select CSV File</label>
+            <input type="file" id="csvFileInput" class="form-control" accept=".csv" required>
+        </div>
+        <button type="button" onclick="uploadCSV()" class="btn btn-primary fw-bold">Upload & Merge Leads</button>
+    </form>
+
+    <div id="statusAlert" class="mt-4"></div>
+</div>
+
+<script>
+async function uploadCSV() {
+    const alertDiv = document.getElementById("statusAlert");
+    const fileInput = document.getElementById("csvFileInput");
+
+    if (!fileInput.files || fileInput.files.length === 0) {
+        alertDiv.innerHTML = `<div class="alert alert-warning">Please select a CSV file first.</div>`;
+        return;
+    }
+
+    alertDiv.innerHTML = `<div class="alert alert-info">Uploading and parsing CSV file... Please wait.</div>`;
+
+    const formData = new FormData();
+    formData.append("file", fileInput.files[0]);
+
+    try {
+        const res = await fetch("/upload", {
+            method: "POST",
+            body: formData
+        });
+        const data = await res.json();
+
+        if (res.ok) {
+            alertDiv.innerHTML = `
+                <div class="alert alert-success">
+                    <h5>File Uploaded Successfully!</h5>
+                    <p>Processed <strong>${data.total_records_processed}</strong> records from <code>${data.filename}</code> into <code>buyers.csv</code>.</p>
+                </div>`;
+        } else {
+            alertDiv.innerHTML = `<div class="alert alert-danger">Error: ${data.detail}</div>`;
+        }
+    } catch (err) {
+        alertDiv.innerHTML = `<div class="alert alert-danger">Failed to upload CSV file.</div>`;
+    }
+}
+</script>
+{% endblock %}

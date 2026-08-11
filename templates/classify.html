@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="card shadow-sm p-4 bg-white border-0">
+    <h3 class="mb-3 text-dark fw-bold">Gemini AI Email Classification</h3>
+    <p class="text-muted">Splits unique contacts from buyers.csv into Business and Individual lists.</p>
+    
+    <button type="button" onclick="runClassify()" class="btn btn-warning text-dark fw-bold">Run AI Classification</button>
+
+    <div id="statusAlert" class="mt-4"></div>
+</div>
+
+<script>
+async function runClassify() {
+    const alertDiv = document.getElementById("statusAlert");
+    alertDiv.innerHTML = `<div class="alert alert-info">Sending emails to Gemini AI for classification... Please wait.</div>`;
+
+    try {
+        const res = await fetch("/classify", { method: "POST" });
+        const data = await res.json();
+        const summary = data.classification_summary;
+        alertDiv.innerHTML = `
+            <div class="alert alert-success">
+                <h5>Classification Complete!</h5>
+                <p>Business Contacts: <strong>${summary.business_count}</strong></p>
+                <p>Individual Contacts: <strong>${summary.individual_count}</strong></p>
+            </div>`;
+    } catch (err) {
+        alertDiv.innerHTML = `<div class="alert alert-danger">Error running AI classification.</div>`;
+    }
+}
+</script>
+{% endblock %}
